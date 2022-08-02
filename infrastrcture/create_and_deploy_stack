@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+import stack_info
+import os, time
+
+cmd = "cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml"
+ans = os.popen(cmd).read()
+print(ans)
+
+cmd = "./clean_template"
+ans = os.popen(cmd).read()
+print(ans)
+
+cmd = '''
+aws cloudformation create-stack \
+  --endpoint-url http://localhost:4566 \
+  --stack-name test1 \
+  --template-body file://template.yaml \
+  --profile localstack
+'''
+ans = os.popen(cmd).read()
+print(ans)
+
+si = stack_info.StackInfo()
+print("\nStack status:")
+stack_status = si.get_stack_status() 
+print("   ", stack_status)
+
+while stack_status=='CREATE_IN_PROGRESS':
+    print("     Waiting  for stack creation to complete")   # Need add time out
+    time.sleep(1)
+    stack_status = si.get_stack_status() 
+
+print("\nStack final status:")
+print("   ", stack_status)
+
+os.system("rm set_stack_env_vars")
+print("\nStack outputs:")
+for output in si.stack_details['Outputs']:
+    key =  output['OutputKey']; val = output['OutputValue'] 
+    print("   ", key, val)
+    open("set_stack_env_vars", 'a').write(f'export {key}={val}\n')
+os.system('chmod +x set_stack_env_vars')
+print("Created the script 'set_stack_env_vars'")
+
+

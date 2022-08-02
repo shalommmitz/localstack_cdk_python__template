@@ -8,3 +8,5 @@ infrastrcture/cdk_template/cdk_out
 infrastrcture/set_stack_env_vars
 infrastrcture/template.yaml
 venv/
+infrastrcture/cdk_template/.venv/
+infrastrcture/cdk_template/template_as_generated_by_cdk.yaml
