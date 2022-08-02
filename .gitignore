@@ -1,0 +1,10 @@
+infrastrcture/cdk_template/__pycache__
+infrastrcture/cdk_template/cdk.out/
+infrastrcture/cdk_template/cdk_template/
+aws-cdk-examples/
+testing/
+*__pycache__
+infrastrcture/cdk_template/cdk_out
+infrastrcture/set_stack_env_vars
+infrastrcture/template.yaml
+venv/
