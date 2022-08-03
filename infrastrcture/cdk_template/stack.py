@@ -25,13 +25,14 @@ class CdkTemplateStack(Stack):
         # Table to hold users
         users_table = dynamo_db.Table(self, "UsersTable",
                           partition_key=dynamo_db.Attribute(name="UserID",  type=dynamo_db.AttributeType.NUMBER),
-                          sort_key=dynamo_db.Attribute(name="UserName", type=dynamo_db.AttributeType.STRING,
-                          read_capacity=2, write_capacity=2)
+                          sort_key=dynamo_db.Attribute(name="UserName", type=dynamo_db.AttributeType.STRING),
+                          read_capacity=2, write_capacity=2
                       )
+        # Table to hold the daily weight of each user
         weights_table = dynamo_db.Table(self, "WeightsTable",
                           partition_key=dynamo_db.Attribute(name="UserID",  type=dynamo_db.AttributeType.NUMBER),
-                          sort_key=dynamo_db.Attribute(name="UtcDate", type=dynamo_db.AttributeType.NUMBER,
-                          read_capacity=2, write_capacity=2)
+                          sort_key=dynamo_db.Attribute(name="UtcDate", type=dynamo_db.AttributeType.NUMBER),
+                          read_capacity=2, write_capacity=2
                       )
 
 ##################### Define the Lambda function #####################

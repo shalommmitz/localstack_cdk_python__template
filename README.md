@@ -73,8 +73,12 @@ sudo apt install -y nodejs
 
 ### Create the project dir and the Python virtual env
 
+THe remaining installations will be local (I.e., using virtual environment)
+You may rename the top folder to reflect the name of your project.
+This folder will be refered to in the rest of this document as the <project folder>
+
+
 ```
-mkdir <project folder>
 cd <project folder>
 python3 -m venv venv
 . venv/bin/activate
