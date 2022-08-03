@@ -44,6 +44,7 @@ Also, most, but not all of the requirments packages are installed locally. THe r
 
 Currently, there are two distict virtual envirments: one dedicated to localstack and the other for CDK and everything else.  This is 'just happened' and might be fixed in later releases.
 
+Another choice is to (mostly) not deal with version numbers and use the cutting-edge versions as offered by pip and github. This works well for me, but might cause issues in the future.
 
 ## Installation
 
@@ -87,7 +88,7 @@ python3 -m venv venv
 ### Install the CDK Python lib: 
 
 ```
-cd infrastrcture/cdk-template
+cd infrastrcture/cdk_template
 pip3 install -r requirements.txt   
 ```
 
@@ -95,11 +96,32 @@ pip3 install -r requirements.txt
 
 '''
 cd <project folder>
-pip3 install robo3
+pip3 install boto3
 git clone https://github.com/localstack/localstack
 cd localstack
 make install
 '''
+
+## Testing and troubleshooting the installation
+
+### Testing CDK
+
+```
+cd <project folder>
+. venv/bin/activate
+cd infrastrcture/cdk_templa
+cdk synth
+```
+
+### Testing localstack
+
+```
+cd <project folder>
+./start_localstack
+```
+
+You should see many messages, but no error messages.
+
 
 # Running everythong
 
