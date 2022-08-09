@@ -1,11 +1,11 @@
 # AWS stand-alone Linux-based development template
 
-A Python-based demonstration of integrating localstack (which allows development w/o AWS account or related expenses) and CDK (AWS's great Infrastrcture-as-code project).
+A Python-based demonstration of integrating localstack (which allows development w/o AWS account or related expenses) and CDK (AWS's great Infrastructure-as-code project).
 
-This demo deploys a functional serverless headend, which is compsed of Lambdas, DyanamoDb and REST-API-gateway.
+This demo deploys a functional serverless backend, which is composed of Lambdas, DynamoDB and REST-API-gateway.
 
 I have made a couple of unconventional choices, which are explained bellow.
-Also, a great effert was done to document the installation process, choices and alternatives.
+Also, a great effort was done to document the installation process, choices and alternatives.
 
 ## Overview
 
@@ -13,44 +13,49 @@ This repository contains the instructions for setup, starting from a clean 20.04
 
 This template uses 3 AWS services:
 
-   - REST API gateway: with IP white-list and the API defined, so the gateway can reject non-well-formed URLs
-   - DynamoDB: defined w/two sample tables at the CDK/stack level
-   - A single lambda that lists the users in the users table
+- REST API gateway: with IP white-list and the API defined, so the gateway can reject non-well-formed URLs
+- DynamoDB: defined w/two sample tables at the CDK/stack level
+- A single lambda that lists the users in the users table
 
 The technologies demonstrated here are:
-                         
-   - Well documented installation procedure, using Python Virtual Envirment(s) for most of the packages
-   - 100 percent local development, by using the wonderfull 'localstack' project
-   - 'single click' infrastrcture deployment, using AWS's CDK project
+
+- Well documented installation procedure, using Python Virtual Environment(s) for most of the packages
+- 100 percent local development, by using the wonderful 'localstack' project
+- 'single click' infrastructure deployment, using AWS's CDK project
 
 I love Python. Therefore, almost all this project uses Python:
 
-   - The stack is defined using Python (at infrastrcture/cdk_template/stack.py)
-   - The sample lambda (at lambda_functions/handle_url_lambda.py) 
-   - Most of the scripts used to 'operate' this project (some are bash)
+- The stack is defined using Python (at infrastructure/cdk_template/stack.py)
+- The sample lambda (at lambda_functions/handle_url_lambda.py) 
+- Most of the scripts used to 'operate' this project (some are bash)
 
 ## Design Choices
 
-CDK: 
-I have choosen the use only the "synth" (I.e., genrate CloudFormation template) feature of the CDK, as opposed to the full 'deploy' functionality. This enables a more detailed control and insight of the deployment proces.
+### CDK:
 
- You may prefer using the CDK-deploy - it will make your life much simpler.
+- I have chosen the use only the "synth" (I.e., generate Cloud-Formation template) feature of the CDK, as opposed to the full 'deploy' functionality. This enables a more detailed control and insight of the deployment process.
+  You may prefer using the CDK-deploy - it will make your life much simpler.
 
-A related item: the way Lambdas are deployed is non-optimal, and will break once the Lambda is above a certail size.  TBD to improve.
+- Lambdas are deployed by reading the code and including the code as part of the stack.
+  This will break once the Lambda is above a certain size.  TBD to improve.
 
-Another choice is using localstack directly on the host (as opposed to the normal way of running localstack in a Docker container). I just feel it make operating the system easier, but there is a price to pay in the installation !
+### Localstack
 
-Also, most, but not all of the requirments packages are installed locally. THe reason some packages are installed globally is that those packages are tyipically used many times and are relativly big. So, it seems a waste of time and disk space to install ther per-project.
+- localstack is used directly on the host (as opposed to the normal way of running localstack in a Docker container). I just feel it make operating the system easier, but there is a price to pay in the installation !
 
-Currently, there are two distict virtual envirments: one dedicated to localstack and the other for CDK and everything else.  This is 'just happened' and might be fixed in later releases.
+### Installation and Environment
 
-Another choice is to (mostly) not deal with version numbers and use the cutting-edge versions as offered by pip and github. This works well for me, but might cause issues in the future.
+- Some of the packages are installed locally, because those packages are typically used many times and are relatively big. So, it seems a waste of time and disk space to install the per-project.
+
+- Currently, there are two distinct virtual environments: one dedicated to localstack and the other for CDK and everything else.  This is 'just happened' and might be fixed in later releases.
+
+- The cutting-edge versions of the packages, as offered by pip and GitHub, are used. This works well for me, but might cause issues in the future. The common practice is use specific versions, and you might choose this.
 
 ## Installation
 
 This project was developed and tested on Xubuntu 22.04, but will probably work on any recent Ubuntu or Debian.
 
-Note: Perform all the 'global' installation onle one time on your new Linux machine.
+Note: Perform all the 'global' installation only one time on your new Linux machine.
 Note: The project is called "match_to_the_weight" and is abriviated to 'mttw' or 'MttW'.
       You will probably want to replace those with your own project name :-)
 
@@ -62,22 +67,24 @@ sudo apt install -y python3-dev libsasl2-dev gcc
 sudo apt install -y openjdk-11-jdk
 ```
 
-### Globaly install the CDK dependencies (nodejs and npm):
+### Globally install the CDK dependencies (nodejs and npm):
 
 ```
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 sudo apt install -y nodejs
 ```
-### Globaly install the CDK toolkilt: 
+
+### Globally install the CDK toolkit:
 
 `sudo npm install -g aws-cdk`
 
 ### Create the project dir and the Python virtual env
 
-THe remaining installations will be local (I.e., using virtual environment)
+The remaining installations will be local (I.e., using virtual environment)
 You may rename the top folder to reflect the name of your project.
 This folder will be refered to in the rest of this document as the <project folder>
 
+### Create the Python virtual environment
 
 ```
 cd <project folder>
@@ -85,10 +92,12 @@ python3 -m venv venv
 . venv/bin/activate
 ```
 
-### Install the CDK Python lib: 
+### Install the CDK Python lib:
 
 ```
-cd infrastrcture/cdk_template
+cd <project folder>
+. venv/bin/activate
+cd infrastructure
 pip3 install -r requirements.txt   
 ```
 
@@ -109,9 +118,11 @@ make install
 ```
 cd <project folder>
 . venv/bin/activate
-cd infrastrcture/cdk_templa
+cd infrastructure/cdk_template
 cdk synth
 ```
+
+Running `cdk synth` should emit to the screen the template (which is a JSON string)
 
 ### Testing localstack
 
@@ -122,49 +133,72 @@ cd <project folder>
 
 You should see many messages, but no error messages.
 
+## Running everything 
 
-# Running everythong
+The below procedure will run all the various components
 
-## Run the local services:
+### Run the localstack service:
 
- - Open a terminal
- - `cd <project folder>`
- - `. venv/bin/activate`
- - `./start_localstack`
+- Open a terminal
+- `cd <project folder>`
+- `./start_localstack
 
-## Deploy the stack
+### Deploy the stack
 
-Notes:
- - You will need to perform this everytime you run the local services, as the open-sourced/free version of localstack forget everything when you turn it off.
+You will need to perform this every time you run the local services, as the open-sourced/free version of localstack forget everything when you turn it off.
 
- - Make sure you run the local services (previous states)
- - `cd <project folder>/infrastrcture`
- - `. venv/bin/activate`
- - `cd Infrastrcture`
- - `./create_and_deploy_stack`    # Behold the power of the CDK: this single command will deploy all your services !
- - `populate_users_table`         # Since we just deployed a fresh instance of DynamoDB, we need test-p. opulation
- - `. set_stack_env_vars`         # This optional step will set some env vars usefull for other scripts
+- Make sure you run the local services (previous states)
+- `cd <project folder>`
+- `. venv/bin/activate`
+- `cd Infrastructure`
+- `./create_and_deploy_stack`    # Behold the power of the CDK: this single command will deploy all your services !
+  Anser 'y' to use localstack    # As opposed to using the 'real' AWS
+- `populate_users_table`         # Since we just deployed a fresh instance of DynamoDB, we need to fill some data into our table(s)
+
+### Run the backend
+
+- Open a terminal
+- cd <project folder>
+- Run: `. venv/bin/activate`
+- `. set_stack_env_vars`         # This optional step will set some env vars useful for other scripts
+- Run `./test`
 
 ## Modify the stack
-  
-  The stack is a definition of all the AWS enteties your project uses.
-  If you need to add or change those resources, you will need to edit the file `<project folder>/infrastrcture/cdk_stack/stack.py.
-  Then run the procedure "Deploy the stack"
 
-TBD: Lambda update process
+  The stack is a definition of all the AWS entities your project uses.
+  If you need to add or change those resources, you will need to edit the file `<project folder>/infrastructure/cdk_stack/stack.py`.
+  Then run the procedure "Deploy the stack" above
 
-TBD: utility functions
+## Lambda update process
+
+  It is assumed that you will spend most of your time itterating on the lambda function(s).
+  And this is where this setup shines: since everything is local, this process is much quicker then when using the 'real' AWS.
+
+  The procedure is:
+ 
+  - Perfome the procedure "Running everything" above 
+  - Run: `debug_lambda`
+    This script will let you edit the lambda function, then deploy the modified lambda, then run the `test` script.
+    How neat is this ?
+
+
+## Utility functions
 
 debug_lambda_in_loop
 show_localstack_lambdas
 show_localstack_status
-show_restApi_resouces
+show_restApi_resources
 start_localstack
 test
 update_lambdas
 
- 
-# Updating localstack (do this once in a blue moon)
+## Using in "real AWS" environment (I.e., w/o localstack)
+
+  Of course we want to move to working in the 'real' AWS environment after the heavy development stage is done.
+
+  The only thing you need to do differently is to NOT enter 'y' when you run `./create_and_deploy_stack`
+
+## Updating localstack (do this once in a blue moon)
 
 ```
 cd localstack
@@ -174,8 +208,5 @@ make install
 ```
 
 ## Licenses
-This project is under the MIT license
 
-This project relays heavily on the following components:
-   - localstack, which has the "Apache License, Version 2.0" license
-   - CDK, which also has the "Apache License, Version 2.0" license
+This project is under the MIT license

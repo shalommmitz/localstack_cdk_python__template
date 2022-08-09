@@ -1,3 +1,4 @@
+import os
 from constructs import Construct
 from aws_cdk import (
     aws_ec2 as ec2,
@@ -19,8 +20,11 @@ class CdkTemplateStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        use_localstack = False
+        if "USE_LOCALSTACK" in os.environ.keys():
+            use_localstack = bool(os.environ["USE_LOCALSTACK"])
 
-##################### Define the DynamoDb tables #####################
+        ##################### Define the DynamoDb tables #####################
 
         # Table to hold users
         users_table = dynamo_db.Table(self, "UsersTable",
@@ -35,26 +39,29 @@ class CdkTemplateStack(Stack):
                           read_capacity=2, write_capacity=2
                       )
 
-##################### Define the Lambda function #####################
+
+        ##################### Define the Lambda function #####################
 
         # defines an AWS Lambda resource that is triggered by the API-gw and accesses the DynamoDb tables
         with open("../../lambda_functions/handle_url_lambda.py", encoding="utf8") as fp:
             handler_code = fp.read()
+        env=    { 'USERS_TABLE_NAME': users_table.table_name,
+                  'USE_LOCALSTACK': f'{use_localstack}'
+        },
         handle_url_lambda = _lambda.Function(self, "lambdaHandler",
                           code=_lambda.InlineCode(handler_code),
                           runtime=_lambda.Runtime.PYTHON_3_8,    # execution environment
                           handler="index.events_handler",            # file.entry-point=function name 
-                          environment=    { 'USERS_TABLE_NAME': users_table.table_name }
-                              )
-                          #code=_lambda.Code.from_asset("../../lambda_functions"),   # Location of lambda source files
-                          #timeout=Duration.seconds(300),
+                          environment=env,
+                          #timeout=Duration.seconds(30),
+        )
 
         # grant lambda role read/write permissions to both tables
         users_table.grant_read_write_data(handle_url_lambda)
         weights_table.grant_read_write_data(handle_url_lambda)
 
-##################### Define the API GW and related policies #####################
 
+        ##################### Define the API GW and related policies #####################
 
 #       # First stage of the API Gateway REST API IAM policy definition
         api_policy_document = iam.PolicyDocument()
@@ -69,6 +76,7 @@ class CdkTemplateStack(Stack):
         )
 
         # Define the URL paths and related method recognized by the gateway
+        # See the script 'test' for example of the API calls defined below
         mttw = api.root.add_resource("MttW")      # Mandatory start on all URLs of our API. 'Santiy' API key
 
         users = mttw.add_resource("users")
@@ -107,7 +115,9 @@ class CdkTemplateStack(Stack):
             )
         )
 
-##################### Define output #####################
+
+        ##################### Define output #####################
+
         CfnOutput(self, 'restApiUrl', value=api.url);
         CfnOutput(self, 'usersTableName', value=users_table.table_name);
         CfnOutput(self, 'usersTableArn', value=users_table.table_arn);

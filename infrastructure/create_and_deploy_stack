@@ -2,19 +2,32 @@
 import stack_info
 import os, time
 
-cmd = "cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml"
+answer = input("Enter 'y' to use localstack (otherwise will target the 'real' AWS) > ")
+use_localstack = ( answer.lower()=="y")
+if use_localstack:
+    print("Will use localstack")
+else:
+    print("Will use the 'real' AWS")
+
+cmd = ""
+if use_localstack:
+    cmd += "export USE_LOCALSTACK=TRUE; "
+else:
+    cmd += "export USE_LOCALSTACK=FALSE; "
+cmd = f'export USE_LOCALSTACK={use_localstack}; cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml'
 ans = os.popen(cmd).read()
 print(ans)
-
+exit()
 cmd = "./clean_template"
 ans = os.popen(cmd).read()
 print(ans)
 
-cmd = '''
-aws cloudformation create-stack \
-  --endpoint-url http://localhost:4566 \
-  --stack-name test1 \
-  --template-body file://template.yaml \
+cmd = 'aws cloudformation create-stack \\\n'
+if use_localstack:
+    cmd += '  --endpoint-url http://localhost:4566 \\\n'
+cmd += '''\
+  --stack-name test1 \\
+  --template-body file://template.yaml \\
   --profile localstack
 '''
 ans = os.popen(cmd).read()
@@ -33,13 +46,16 @@ while stack_status=='CREATE_IN_PROGRESS':
 print("\nStack final status:")
 print("   ", stack_status)
 
-os.system("rm set_stack_env_vars")
+os.system("rm ../set_stack_env_vars")
 print("\nStack outputs:")
-for output in si.stack_details['Outputs']:
+outputs = si.stack_details['Outputs']
+if use_localstack:
+    outputs["USE_LOCALSTACK"] = "TRUE"
+for output in outputs:
     key =  output['OutputKey']; val = output['OutputValue'] 
     print("   ", key, val)
-    open("set_stack_env_vars", 'a').write(f'export {key}={val}\n')
+    open("../set_stack_env_vars", 'a').write(f'export {key}={val}\n')
 os.system('chmod +x set_stack_env_vars')
-print("Created the script 'set_stack_env_vars'")
+print("Created the script '../set_stack_env_vars'")
 
 
