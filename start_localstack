@@ -1,5 +1,5 @@
 cd localstack
- .venv/bin/activate; exec bin/localstack start --host
+. .venv/bin/activate; exec bin/localstack start --host
 # SERVICES=lambda,sqs,dynamodb DEBUG=1 localstack start --host
 #SERVICES=lambda,sqs,dynamodb localstack start --host
 #make start
