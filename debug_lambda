@@ -1,0 +1,1 @@
+vi lambda_functions/handle_url_lambda.py; ./update_lambdas; sleep 1; ./test
