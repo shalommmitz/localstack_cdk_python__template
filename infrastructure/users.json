@@ -1,0 +1,28 @@
+{
+    "test1-UsersTable9725E9C8-2061d2ea": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "ID": {"S": "0"},
+                    "UserName": {"S": "Nickname0"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "ID": {"S": "1"},
+                    "UserName": {"S": "First1 Last1"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "ID": {"S": "2"},
+                    "UserName": {"S": "First2 M.2 ReallyReallyLongLast2"}
+                }
+            }
+        }
+    ]
+}

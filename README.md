@@ -55,6 +55,8 @@ I love Python. Therefore, almost all this project uses Python:
 
 This project was developed and tested on Xubuntu 22.04, but will probably work on any recent Ubuntu or Debian.
 
+By nececity, we are using 3 different installation methods: using Ubuntu's native `apt`, using Python's native `pip3` and using nodejs/npm (which is required to install the CDK software).
+
 Note: Perform all the 'global' installation only one time on your new Linux machine.
 Note: The project is called "match_to_the_weight" and is abriviated to 'mttw' or 'MttW'.
       You will probably want to replace those with your own project name :-)

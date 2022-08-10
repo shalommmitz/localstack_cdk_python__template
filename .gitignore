@@ -13,6 +13,8 @@ infrastructure/set_stack_env_vars
 infrastructure/template.yaml
 infrastructure/node_modules
 infrastructure/cdk_template/.venv/
+infrastructure/package-lock.json
+infrastructure/package.json
 infrastructure/cdk_template/template_as_generated_by_cdk.yaml
 lambda_functions/__pycache__
 lambda_functions/index.py

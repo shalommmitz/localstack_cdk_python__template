@@ -45,9 +45,9 @@ class CdkTemplateStack(Stack):
         # defines an AWS Lambda resource that is triggered by the API-gw and accesses the DynamoDb tables
         with open("../../lambda_functions/handle_url_lambda.py", encoding="utf8") as fp:
             handler_code = fp.read()
-        env=    { 'USERS_TABLE_NAME': users_table.table_name,
+        env= { 'USERS_TABLE_NAME': users_table.table_name,
                   'USE_LOCALSTACK': f'{use_localstack}'
-        },
+             }
         handle_url_lambda = _lambda.Function(self, "lambdaHandler",
                           code=_lambda.InlineCode(handler_code),
                           runtime=_lambda.Runtime.PYTHON_3_8,    # execution environment
