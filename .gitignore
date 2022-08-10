@@ -19,3 +19,4 @@ infrastructure/cdk_template/template_as_generated_by_cdk.yaml
 lambda_functions/__pycache__
 lambda_functions/index.py
 lambda_functions/abc.zip
+localstack/
