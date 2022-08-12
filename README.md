@@ -55,15 +55,16 @@ I love Python. Therefore, almost all this project uses Python:
 
 This project was developed and tested on Xubuntu 22.04, but will probably work on any recent Ubuntu or Debian.
 
-By nececity, we are using 3 different installation methods: using Ubuntu's native `apt`, using Python's native `pip3` and using nodejs/npm (which is required to install the CDK software).
+By necessity, we are using 3 different installation methods: using Ubuntu's native `apt`, using Python's native `pip3` and using nodejs/npm (which is required to install the CDK software).
 
 Note: Perform all the 'global' installation only one time on your new Linux machine.
-Note: The project is called "match_to_the_weight" and is abriviated to 'mttw' or 'MttW'.
+Note: The project is called "match_to_the_weight" and is abbreviated to 'mttw' or 'MttW'.
       You will probably want to replace those with your own project name :-)
 
 ### Globally install the Localstack dependencies:
 
 ```
+sudo apt install -y awscli
 sudo apt install -y python3-pip python3-venv
 sudo apt install -y python3-dev libsasl2-dev gcc
 sudo apt install -y openjdk-11-jdk
@@ -80,11 +81,26 @@ sudo apt install -y nodejs
 
 `sudo npm install -g aws-cdk`
 
+### Configure AWS profile
+
+In order to use localstack, we need an AWS profile configured.
+If you already have a profile defined, localhost will work fine with the existing definition.
+If you do not have a profile defined, you can create a new profile by running `aws configure`
+Please run the following commands:
+```
+aws configure set aws_access_key_id dummyKey
+aws configure set aws_secret_access_key dummaySecret
+aws configure set region us-east-1
+aws configure set output json
+```
+
+Note: when/if you start working w/the 'real' AWS, you will need to re-run the above with new values. Localstack will work correctly with the new values, as it does not care about the actual values of the access-key and the secret-access-key.
+
 ### Create the project dir and the Python virtual env
 
 The remaining installations will be local (I.e., using virtual environment)
 You may rename the top folder to reflect the name of your project.
-This folder will be refered to in the rest of this document as the <project folder>
+This folder will be referred to in the rest of this document as the <project folder>
 
 ### Create the Python virtual environment
 
@@ -154,7 +170,7 @@ You will need to perform this every time you run the local services, as the open
 - `. venv/bin/activate`
 - `cd Infrastructure`
 - `./create_and_deploy_stack`    # Behold the power of the CDK: this single command will deploy all your services !
-  Anser 'y' to use localstack    # As opposed to using the 'real' AWS
+  Answer 'y' to use localstack    # As opposed to using the 'real' AWS
 - `populate_users_table`         # Since we just deployed a fresh instance of DynamoDB, we need to fill some data into our table(s)
 
 ### Run the backend
@@ -173,12 +189,12 @@ You will need to perform this every time you run the local services, as the open
 
 ## Lambda update process
 
-  It is assumed that you will spend most of your time itterating on the lambda function(s).
+  It is assumed that you will spend most of your time iterating on the lambda function(s).
   And this is where this setup shines: since everything is local, this process is much quicker then when using the 'real' AWS.
 
   The procedure is:
  
-  - Perfome the procedure "Running everything" above 
+  - Perform the procedure "Running everything" above 
   - Run: `debug_lambda`
     This script will let you edit the lambda function, then deploy the modified lambda, then run the `test` script.
     How neat is this ?
