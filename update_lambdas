@@ -1,0 +1,9 @@
+cd lambda_functions
+rm abc.zip
+sleep 0.4
+cp handle_url_lambda.py index.py
+zip abc handle_url_lambda.py index.py
+aws --endpoint-url=http://localhost:4566 \
+lambda update-function-code \
+--function-name $handleUrlTableName \
+--zip-file fileb://abc.zip
