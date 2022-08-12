@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 
 import boto3
+import os
 
 class StackInfo(object):
-   def __init__(self):
-       boto3.setup_default_session(profile_name='localstack')
-       self.client = boto3.client('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
-       self.resource = boto3.resource('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
+   def __init__(self, use_localstack=False):
+       #boto3.setup_default_session(profile_name='localstack')
+       #self.client = boto3.client('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
+       #self.resource = boto3.resource('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
+       if use_localstack:
+           self.client = boto3.client('cloudformation', endpoint_url="http://localhost:4566")
+           self.resource = boto3.resource('cloudformation', endpoint_url="http://localhost:4566")
+       else:
+           self.client = boto3.client('cloudformation')
+           self.resource = boto3.resource('cloudformation')
        self.stacks = []
        for stack in self.resource.stacks.all():
            self.stacks.append(stack.name)
@@ -23,7 +30,10 @@ class StackInfo(object):
        return self.stack_status
 
 if __name__=="__main__":
-    si = StackInfo()
+    use_localstack = False
+    if "USE_LOCALSTACK" in os.environ():
+        use_localstack = bool(os.environ["USE_LOCALSTACK"])
+    si = StackInfo(use_localstack)
     print("Found the following stacks: ", si.stacks)
 
     status_to_not_print = ["UPDATE_COMPLETE", "CREATE_COMPLETE", "UPDATE_IN_PROGRESS"]

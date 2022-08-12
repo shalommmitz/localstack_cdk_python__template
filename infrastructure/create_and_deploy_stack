@@ -14,26 +14,28 @@ if use_localstack:
     cmd += "export USE_LOCALSTACK=TRUE; "
 else:
     cmd += "export USE_LOCALSTACK=FALSE; "
+
+print("Generating CloudFormatioon template JSON using CDK")
 cmd = f'export USE_LOCALSTACK={use_localstack}; cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml'
 ans = os.popen(cmd).read()
-print(ans)
-exit()
+
+print("Stripping the CloudFormatioon template of CDK metadata")
 cmd = "./clean_template"
 ans = os.popen(cmd).read()
 print(ans)
 
+print("Deploying the AWS resources defined in the template, using CloudFormation")
 cmd = 'aws cloudformation create-stack \\\n'
 if use_localstack:
     cmd += '  --endpoint-url http://localhost:4566 \\\n'
 cmd += '''\
   --stack-name test1 \\
-  --template-body file://template.yaml \\
-  --profile localstack
+  --template-body file://template.yaml
 '''
 ans = os.popen(cmd).read()
 print(ans)
 
-si = stack_info.StackInfo()
+si = stack_info.StackInfo(use_localstack)
 print("\nStack status:")
 stack_status = si.get_stack_status() 
 print("   ", stack_status)
@@ -46,11 +48,15 @@ while stack_status=='CREATE_IN_PROGRESS':
 print("\nStack final status:")
 print("   ", stack_status)
 
-os.system("rm ../set_stack_env_vars")
+if stack_status=="CREATE_FAILED":
+    print("Aborting, because stack creation has failed")
+    exit()
+
+os.system("rm -f ../set_stack_env_vars")
 print("\nStack outputs:")
 outputs = si.stack_details['Outputs']
 if use_localstack:
-    outputs["USE_LOCALSTACK"] = "TRUE"
+    outputs.append( {'OutputKey': "USE_LOCALSTACK", 'OutputValue': "TRUE"} )
 for output in outputs:
     key =  output['OutputKey']; val = output['OutputValue'] 
     print("   ", key, val)

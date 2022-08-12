@@ -6,7 +6,7 @@ def get_table_data(table_name, use_localstack):
     if use_localstack:
         kwargs["endpoint_url"] = "http://localhost:4566"
     users = []
-    dynamodb = boto3.resource('dynamodb',region_name='us-east-1', **kwargs`)
+    dynamodb = boto3.resource('dynamodb',region_name='us-east-1', **kwargs)
     table = dynamodb.Table(table_name)
     response = table.scan()
     users.extend(response.get('Items', []))
