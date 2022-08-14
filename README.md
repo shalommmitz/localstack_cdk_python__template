@@ -216,10 +216,14 @@ cd infrastructure`
     How neat is this ?
 
 
-## Utility functions
+## Utility scripts 
 
-debug_lambda_in_loop
-show_localstack_lambdas
+### show_localstack_lambdas
+
+Will list all the deployed lambdas
+
+### debug_lambda_in_loop
+
 show_localstack_status
 show_restApi_resources
 start_localstack
@@ -231,6 +235,7 @@ update_lambdas
   Of course we want to move to working in the 'real' AWS environment after the heavy development stage is done.
 
   The only thing you need to do differently is to NOT enter 'y' when you run `./create_and_deploy_stack`
+
 
 ## Updating localstack (do this once in a blue moon)
 

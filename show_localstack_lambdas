@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+import boto3
+
+boto3.setup_default_session(profile_name='localstack')
+client = boto3.client('lambda',region_name='us-east-1', endpoint_url="http://localhost:4566")
+response = client.list_functions()
+
+for function in response["Functions"]:
+    name = function['FunctionName']
+    print(name)
+    print(function)
