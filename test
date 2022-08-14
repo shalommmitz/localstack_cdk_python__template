@@ -1,3 +1,3 @@
-rm users
+rm -f users
 wget ${restApiUrl}MttW/users
 cat users

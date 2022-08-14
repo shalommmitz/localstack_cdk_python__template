@@ -61,7 +61,7 @@ for output in outputs:
     key =  output['OutputKey']; val = output['OutputValue'] 
     print("   ", key, val)
     open("../set_stack_env_vars", 'a').write(f'export {key}={val}\n')
-os.system('chmod +x set_stack_env_vars')
+os.system('chmod +x ../set_stack_env_vars')
 print("Created the script '../set_stack_env_vars'")
 
 

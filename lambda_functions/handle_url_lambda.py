@@ -10,12 +10,7 @@ def get_table_data(table_name, use_localstack):
     table = dynamodb.Table(table_name)
     response = table.scan()
     users.extend(response.get('Items', []))
-    return users
-#    data = response['Items']
-#    #while 'LastEvaluatedKey' in response:
-#    #   response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
-#    #   data.extend(response['Items'])
-#    return data
+    return str(users)
 
 def events_handler(events, context):
     print("Starting events_handler")

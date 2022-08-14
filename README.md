@@ -64,6 +64,7 @@ Note: The project is called "match_to_the_weight" and is abbreviated to 'mttw' o
 ### Globally install the Localstack dependencies:
 
 ```
+sudo apt install -y zip unzip
 sudo apt install -y awscli
 sudo apt install -y python3-pip python3-venv
 sudo apt install -y python3-dev libsasl2-dev gcc
@@ -166,14 +167,29 @@ The below procedure will run all the various components
 You will need to perform this every time you run the local services, as the open-sourced/free version of localstack forget everything when you turn it off.
 
 - Make sure you run the local services (previous states)
-- `cd <project folder>`
-- `. venv/bin/activate`
-- `cd Infrastructure`
-- `./create_and_deploy_stack`    # Behold the power of the CDK: this single command will deploy all your services !
-  Answer 'y' to use localstack    # As opposed to using the 'real' AWS
-- `populate_users_table`         # Since we just deployed a fresh instance of DynamoDB, we need to fill some data into our table(s)
+- Deploy the stack:
 
-### Run the backend
+```
+cd <project folder>`
+. venv/bin/activate`
+cd infrastructure`
+./create_and_deploy_stack`    # Behold the power of the CDK: this single command will deploy all your services !
+```
+
+  Answer 'y' to use localstack    # As opposed to using the 'real' AWS
+
+- IMPORTANT: set the needed env. variables:
+
+  ```
+  cd ..
+  . set_stack_env_vars
+  ```
+
+- Optional: Fill the 'users' table with test data
+
+`./populate_users_table`       
+
+### End-to-end test: Run the backend
 
 - Open a terminal
 - cd <project folder>
