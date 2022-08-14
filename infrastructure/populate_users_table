@@ -1,2 +1,35 @@
-aws --endpoint-url=http://localhost:4566 \
-dynamodb batch-write-item --request-items file://users.json
+#!/usr/bin/env python3
+
+# Source of this code: https://hands-on.cloud/working-with-aws-batch-in-python-using-boto3/
+
+import yaml
+import boto3
+import os
+
+use_localstack = False
+if "USE_LOCALSTACK" in os.environ.keys():
+     use_localstack = (os.environ["USE_LOCALSTACK"].lower()=="true")
+print(use_localstack)
+
+try:
+    table_name = os.environ['usersTableName']
+except:
+    print("ERROR: expected envirnment variable 'usersTableName' does not exist - Abborting")
+    exit()
+
+if use_localstack:
+    resource = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
+else:
+    resource = boto3.resource('dynamodb')
+
+table = resource.Table(table_name)
+
+users = yaml.safe_load(open("users.yaml"))
+
+for user in users:
+    UserID = list(user.keys())[0]
+    table.put_item(
+        Item={ 'UserID': int(UserID), 'UserName': user[UserID] }
+    )
+
+print('records imported successfully')
