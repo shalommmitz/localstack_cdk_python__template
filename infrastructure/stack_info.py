@@ -11,53 +11,38 @@ class StackInfo(object):
        else:
            self.client = boto3.client('cloudformation')
            self.resource = boto3.resource('cloudformation')
-       self.stacks = []
-       for stack in self.resource.stacks.all():
-           self.stacks.append(stack.name)
-       if len(self.stacks)!=1:
-           print("Expecting exactly one stack - which is not the case - Aborting")
-           exit()
-       self.stack_name = self.stacks[0]
-       self.stack_details = self.client.describe_stacks(StackName=self.stack_name)["Stacks"][0]
-       self.stack_resources = self.client.list_stack_resources(StackName=self.stack_name)
-       self.stack_events = self.client.describe_stack_events(StackName=self.stack_name)["StackEvents"]
-   def get_stack_status(self):
-       self.stack_details = self.client.describe_stacks(StackName=self.stack_name)["Stacks"][0]
-       self.stack_status = self.stack_details['StackStatus']
-       return self.stack_status
+   def get_num_stacks(self):
+       self.connection_success_msg = ""
+       num_stacks = 0
+       try:
+           for stack in self.resource.stacks.all():
+               num_stacks += 1
+       except:
+           msg = "ERROR: could not connect to AWS. Maybe localstack is not running ?"
+           self.connection_success_msg = msg
+       return num_stacks
+
+   def get_stack_outputs(self, stack_name):
+       try:
+           stack_details = self.client.describe_stacks(StackName=stack_name)["Stacks"][0]
+           return stack_details['Outputs']
+       except:
+           print("Could not find a stack named", stack_name)
+           return None    
+   def get_stack_status(self, stack_name):
+       try:
+           stack_details = self.client.describe_stacks(StackName=stack_name)["Stacks"][0]
+           return stack_details['StackStatus']
+       except:
+           print("Could not find a stack named", stack_name)
+           return None    
 
 if __name__=="__main__":
     use_localstack = False
-    if "USE_LOCALSTACK" in os.environ():
+    if "USE_LOCALSTACK" in os.environ.keys():
         use_localstack = (os.environ["USE_LOCALSTACK"].lower()=="true")
+
     si = StackInfo(use_localstack)
-    print("Found the following stacks: ", si.stacks)
-
-    status_to_not_print = ["UPDATE_COMPLETE", "CREATE_COMPLETE", "UPDATE_IN_PROGRESS"]
-
-    print("\nResources info:")
-    for r in si.stack_resources["StackResourceSummaries"]:
-        id = r["LogicalResourceId"]
-        status = r["ResourceStatus"]
-        if status in status_to_not_print:
-           continue
-        print("   ", id, status)
-
-    print("\nStack events:")
-    for event in si.stack_events:
-        id = event['LogicalResourceId']
-        status = event["ResourceStatus"]
-        type = event['ResourceType']
-        if status in status_to_not_print:
-            continue
-        print("   ", id, type, status)
-        if "ResourceStatusReason" in event.keys():
-            print("      ", event["ResourceStatusReason"])
-
-    print("\nStack status:")
-    print("   ", si.get_stack_status)
-
-    print("\nStack outputs:")
-    for output in si.stack_details['Outputs']:
-        print("   ", output['OutputKey'], output['OutputValue'])
+    print("Number of stacks: ", si.get_num_stacks())
+    print("Status of stack 'test1':", si.get_stack_status('test1'))
 

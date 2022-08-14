@@ -9,7 +9,10 @@ import os
 use_localstack = False
 if "USE_LOCALSTACK" in os.environ.keys():
      use_localstack = (os.environ["USE_LOCALSTACK"].lower()=="true")
-print(use_localstack)
+if use_localstack:
+    print("Will use the localstack")
+else:
+    print("Will use the 'real' AWS")
 
 try:
     table_name = os.environ['usersTableName']

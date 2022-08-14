@@ -4,6 +4,7 @@ testing/
 *__pycache__
 users
 README.md.bak
+set_stack_env_vars
 infrastructure/cdk_template/__pycache__
 infrastructure/cdk_template/cdk.json
 infrastructure/cdk_template/cdk.out/

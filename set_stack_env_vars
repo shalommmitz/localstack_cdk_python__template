@@ -1,6 +1,0 @@
-export matchToTheWeightapiEndpointB1C12C65=https://zqx4pzcwe6.execute-api.localhost.localstack.cloud:4566/prod/
-export restApiUrl=https://zqx4pzcwe6.execute-api.localhost.localstack.cloud:4566/prod/
-export usersTableName=test1-UsersTable9725E9C8-4f62b8c1
-export usersTableArn=arn:aws:dynamodb:us-east-1:000000000000:table/test1-UsersTable9725E9C8-4f62b8c1
-export handleUrlTableName=test1-lambdaHandler364934B6-c14c37f5
-export USE_LOCALSTACK=TRUE

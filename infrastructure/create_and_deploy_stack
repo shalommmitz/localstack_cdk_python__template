@@ -8,12 +8,22 @@ if use_localstack:
     print("Will use localstack")
 else:
     print("Will use the 'real' AWS")
+print()
 
-cmd = ""
-if use_localstack:
-    cmd += "export USE_LOCALSTACK=TRUE; "
-else:
-    cmd += "export USE_LOCALSTACK=FALSE; "
+# Check if the stack we are about to create already exists
+si = stack_info.StackInfo(use_localstack)
+num_stacks = si.get_num_stacks()
+if si.connection_success_msg:
+    print(si.connection_success_msg)
+    print("Aborting")
+    exit()
+print("Before we start the creation of a new stack, there are",num_stacks, "stack(s).")
+status = si.get_stack_status("test1")
+if status!=None:
+    print("Stack 'test1' pre-exists - Aborintg")
+    print("   If you use localstak: restarting localstack will help")
+    print("   If you use the 'real' AWS: Delete the exissting stack")
+    exit()
 
 print("Generating CloudFormatioon template JSON using CDK")
 cmd = f'export USE_LOCALSTACK={use_localstack}; cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml'
@@ -34,16 +44,18 @@ cmd += '''\
 '''
 ans = os.popen(cmd).read()
 print(ans)
+if ans=='Could not connect to the endpoint URL: "http://localhost:4566/"':
+    print("Aborting - maybe you need to run localstack at a different terminal ?")
 
-si = stack_info.StackInfo(use_localstack)
+
 print("\nStack status:")
-stack_status = si.get_stack_status() 
+stack_status = si.get_stack_status('test1') 
 print("   ", stack_status)
 
 while stack_status=='CREATE_IN_PROGRESS':
     print("     Waiting  for stack creation to complete")   # Need add time out
     time.sleep(1)
-    stack_status = si.get_stack_status() 
+    stack_status = si.get_stack_status('test1') 
 
 print("\nStack final status:")
 print("   ", stack_status)
@@ -54,14 +66,16 @@ if stack_status=="CREATE_FAILED":
 
 os.system("rm -f ../set_stack_env_vars")
 print("\nStack outputs:")
-outputs = si.stack_details['Outputs']
-if use_localstack:
-    outputs.append( {'OutputKey': "USE_LOCALSTACK", 'OutputValue': "TRUE"} )
+outputs = si.get_stack_outputs('test1')
+outputs.append( {'OutputKey': "USE_LOCALSTACK", 'OutputValue': str(use_localstack)} )
 for output in outputs:
     key =  output['OutputKey']; val = output['OutputValue'] 
     print("   ", key, val)
     open("../set_stack_env_vars", 'a').write(f'export {key}={val}\n')
 os.system('chmod +x ../set_stack_env_vars')
 print("Created the script '../set_stack_env_vars'")
+print("Recomended next steps:")
+print("   Run: . ../set_stack_env_vars")
+print("   Run: ./populate_users_table")
 
 
