@@ -1,0 +1,27 @@
+- name: setup hosts
+  hosts: all
+  connection: local
+  become: true
+  tasks:
+    - name: Install zip and unzip  and update the cache
+      apt:
+        name: [ "zip", "unzip" ]
+        state: latest
+        update_cache: yes
+    - name: Install awscli
+      apt:
+        name: awscli
+        state: latest
+    - name: "Install python-pip and virtual envirnment"
+      apt:
+        name: [ "python3-pip", "python3-venv" ]
+      #shell:
+        #"apt install xubuntu-core^"
+    - name: "Install Python dev and related utils"
+      apt:
+        name: [ "python3-dev", "libsasl2-dev", "gcc" ]
+        state: latest
+    - name: "Install the Java Development Kit"
+      apt:
+        name: openjdk-11-jdk
+        state: latest

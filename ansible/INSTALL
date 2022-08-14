@@ -1,0 +1,2 @@
+sudo apt install -y ansible
+ansible-playbook -i hosts --extra-vars "nonRootUser=$USER" --ask-become-pass all_tasks.yml
