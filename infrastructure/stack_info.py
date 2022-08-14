@@ -5,9 +5,6 @@ import os
 
 class StackInfo(object):
    def __init__(self, use_localstack=False):
-       #boto3.setup_default_session(profile_name='localstack')
-       #self.client = boto3.client('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
-       #self.resource = boto3.resource('cloudformation',region_name='us-east-1', endpoint_url="http://localhost:4566")
        if use_localstack:
            self.client = boto3.client('cloudformation', endpoint_url="http://localhost:4566")
            self.resource = boto3.resource('cloudformation', endpoint_url="http://localhost:4566")
@@ -32,7 +29,7 @@ class StackInfo(object):
 if __name__=="__main__":
     use_localstack = False
     if "USE_LOCALSTACK" in os.environ():
-        use_localstack = bool(os.environ["USE_LOCALSTACK"])
+        use_localstack = (os.environ["USE_LOCALSTACK"].lower()=="true")
     si = StackInfo(use_localstack)
     print("Found the following stacks: ", si.stacks)
 
