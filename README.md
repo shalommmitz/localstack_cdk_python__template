@@ -86,8 +86,8 @@ sudo apt install -y nodejs
 
 In order to use localstack, we need an AWS profile configured.
 If you already have a profile defined, localhost will work fine with the existing definition.
-If you do not have a profile defined, you can create a new profile by running `aws configure`
-Please run the following commands:
+If you do not have a profile defined, the below commands will create a new profile:
+
 ```
 aws configure set aws_access_key_id dummyKey
 aws configure set aws_secret_access_key dummaySecret
@@ -95,7 +95,7 @@ aws configure set region us-east-1
 aws configure set output json
 ```
 
-Note: when/if you start working w/the 'real' AWS, you will need to re-run the above with new values. Localstack will work correctly with the new values, as it does not care about the actual values of the access-key and the secret-access-key.
+Note: when/if you start working w/the 'real' AWS, you will need to re-run the above with new values. Localstack will work correctly with the new values, as it does not care about the actual values present.
 
 ### Create the project dir and the Python virtual env
 
@@ -158,7 +158,7 @@ The below procedure will run all the various components
 
 ### Run the localstack service:
 
-- Open a terminal
+- Open a new terminal
 - `cd <project folder>`
 - `./start_localstack
 
@@ -166,7 +166,7 @@ The below procedure will run all the various components
 
 You will need to perform this every time you run the local services, as the open-sourced/free version of localstack forget everything when you turn it off.
 
-- Make sure you run the local services (previous states)
+- Make sure you run the localstack service (previous step)
 - Deploy the stack:
 
 ```
@@ -222,9 +222,16 @@ cd infrastructure`
 
 Will list all the deployed lambdas
 
-### debug_lambda_in_loop
+### debug_lambda
 
-show_localstack_status
+The most usefull script when itterating on a Lambda's source code.
+
+This script will vi a Lambda, then deploy the modified code, then run the 'test' script to trigger the Lambda. Rince and repeate.
+
+### show_localstack_status
+
+A script to show which AWS-services are running or avialable by the running localstack instance
+
 show_restApi_resources
 start_localstack
 test

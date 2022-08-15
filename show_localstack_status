@@ -1,0 +1,3 @@
+cd localstack
+. .venv/bin/activate; exec bin/localstack status services
+READ AABBCC
