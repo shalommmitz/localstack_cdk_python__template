@@ -119,6 +119,7 @@ class CdkTemplateStack(Stack):
         ##################### Define output #####################
 
         CfnOutput(self, 'restApiUrl', value=api.url);
+        CfnOutput(self, 'restApiId', value=api.rest_api_id);
         CfnOutput(self, 'usersTableName', value=users_table.table_name);
         CfnOutput(self, 'usersTableArn', value=users_table.table_arn);
         CfnOutput(self, 'handleUrlTableName', value=handle_url_lambda.function_name);

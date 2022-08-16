@@ -1,3 +1,4 @@
 rm -f users
 wget ${restApiUrl}MttW/users
 cat users
+#curl -X POST -d '{ "customerId": 1 }' https://example.com/

@@ -23,6 +23,7 @@ if status!=None:
     print("Stack 'test1' pre-exists - Aborintg")
     print("   If you use localstak: restarting localstack will help")
     print("   If you use the 'real' AWS: Delete the exissting stack")
+    print("   WARNING: the above two actions might erase all your table data.")
     exit()
 
 print("Generating CloudFormatioon template JSON using CDK")

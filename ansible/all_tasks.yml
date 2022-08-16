@@ -3,7 +3,10 @@
   connection: local
   become: true
   tasks:
-    - name: Install zip and unzip  and update the cache
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: yes
+    - name: Install zip and unzip
       apt:
         name: [ "zip", "unzip" ]
         state: latest
@@ -25,3 +28,20 @@
       apt:
         name: openjdk-11-jdk
         state: latest
+    - name: Detect if NPM (the Nodejs Package Manager) is installed
+      shell: "which npmu | wc -c"
+      register: is_npm_present
+    - name: Install the apt-repository for v16.x nodejs/npm, only if not already installed
+      shell: 'curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
+      when: is_npm_present["stdout"] == "0"
+    - name: Install nodejs and npm v16.x , only if not already installed
+      apt:
+        name: nodejs
+        state: latest
+      when: is_npm_present["stdout"] == "0"
+    - name: Install the AWS CDK node.js package globally.
+      community.general.npm:
+        name: aws-cdk
+        global: yes
+
+
