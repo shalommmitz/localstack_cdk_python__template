@@ -9,7 +9,7 @@ Also, a great effort was done to document the installation process, choices and 
 
 ## Overview
 
-This repository contains the instructions for setup, starting from a clean 20.04 Ubuntu, of a Python-based backend project.
+This repository contains the instructions for setup, starting from a clean 20.04 Ubuntu, of a Python-based back-end project.
 
 This template uses 3 AWS services:
 
@@ -57,9 +57,19 @@ This project was developed and tested on Xubuntu 22.04, but will probably work o
 
 By necessity, we are using 3 different installation methods: using Ubuntu's native `apt`, using Python's native `pip3` and using nodejs/npm (which is required to install the CDK software).
 
-Note: Perform all the 'global' installation only one time on your new Linux machine.
-Note: The project is called "match_to_the_weight" and is abbreviated to 'mttw' or 'MttW'.
-      You will probably want to replace those with your own project name :-)
+Notes: 
+
+- You might want to change the top-folder name (currently: `cdk_python_localstack_template`) with your own project name.
+
+- Perform all the 'global' installation only one time on your new Linux machine.
+
+- You may perform all the global installations automatically by running 
+  
+  `cd ansible; ./INSTALL`
+  
+  This will globally install the  Localstack dependencies, nodejs and the CDK.
+  
+  You will need to type your user password twice: to install ansible and then to allow: ansible to do the global installation  
 
 ### Globally install the Localstack dependencies:
 
@@ -130,9 +140,9 @@ cd localstack
 make install
 '''
 
-## Testing and troubleshooting the installation
+## Sanity testing and troubleshooting the installation
 
-### Testing CDK
+### Testing the  CDK
 
 ```
 cd <project folder>
@@ -141,9 +151,13 @@ cd infrastructure/cdk_template
 cdk synth
 ```
 
-Running `cdk synth` should emit to the screen the template (which is a JSON string)
+Running `cdk synth` should emit to the screen the template (which is a JSON string).
 
-### Testing localstack
+If there are issues:
+
+- Did you activate the virtual environment ?
+
+### Testing the localstack
 
 ```
 cd <project folder>
@@ -152,7 +166,7 @@ cd <project folder>
 
 You should see many messages, but no error messages.
 
-## Running everything 
+## Running everything
 
 The below procedure will run all the various components
 
@@ -179,7 +193,7 @@ cd infrastructure`
   Answer 'y' to use localstack    # As opposed to using the 'real' AWS
 
 - IMPORTANT: set the needed env. variables:
-
+  
   ```
   cd ..
   . set_stack_env_vars
@@ -209,14 +223,13 @@ cd infrastructure`
   And this is where this setup shines: since everything is local, this process is much quicker then when using the 'real' AWS.
 
   The procedure is:
- 
-  - Perform the procedure "Running everything" above 
-  - Run: `debug_lambda`
-    This script will let you edit the lambda function, then deploy the modified lambda, then run the `test` script.
-    How neat is this ?
 
+- Perform the procedure "Running everything" above 
+- Run: `debug_lambda`
+  This script will let you edit the lambda function, then deploy the modified lambda, then run the `test` script.
+  How neat is this ?
 
-## Utility scripts 
+## Utility scripts
 
 ### show_localstack_lambdas
 
@@ -224,25 +237,36 @@ Will list all the deployed lambdas
 
 ### debug_lambda
 
-The most usefull script when itterating on a Lambda's source code.
+The most useful script when iterating on a Lambda's source code.
 
-This script will vi a Lambda, then deploy the modified code, then run the 'test' script to trigger the Lambda. Rince and repeate.
+This script will vi a Lambda, then deploy the modified code, then run the 'test' script to trigger the Lambda. Rinse and repeat.
+
+### update_lambdas
+
+This scripts upload the current code of the Lambda (present at the folder lambda_functions) to AWS.
+This script is called by the script 'debug_lambda'
 
 ### show_localstack_status
 
-A script to show which AWS-services are running or avialable by the running localstack instance
+A script to show which AWS-services are running or available by the running localstack instance
 
-show_restApi_resources
-start_localstack
-test
-update_lambdas
+### show_restApi_resources
+
+A script to show the available REST API paths
+
+### start_localstack
+
+A script to start the localstack. You will normally execute this script as the first action.
+
+### test
+
+End-to-end example test: sends a URL to the gateway, which runs the Lambda, which accesses the 
 
 ## Using in "real AWS" environment (I.e., w/o localstack)
 
   Of course we want to move to working in the 'real' AWS environment after the heavy development stage is done.
 
   The only thing you need to do differently is to NOT enter 'y' when you run `./create_and_deploy_stack`
-
 
 ## Updating localstack (do this once in a blue moon)
 

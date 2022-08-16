@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import boto3
+import os
+
+if not "restApiId" in os.environ.keys():
+    print("ERROR: could not find the env var 'restApiId' - Aborint")
+    print("   You might run '. set_stack_env_vars' to set it.")
+    exit()
+restApiId = os.environ["restApiId"]
+
+try:
+    use_localstack = bool(os.environ["USE_LOCALSTACK"])
+except:
+    use_localstack = False
+
+if use_localstack:
+    client = boto3.client('apigateway', endpoint_url="http://localhost:4566")
+else:
+    client = boto3.client('apigateway')
+    
+items = client.get_resources(restApiId=restApiId)["items"]
+for item in items:
+    print(item["path"])
