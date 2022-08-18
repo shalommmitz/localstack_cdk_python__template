@@ -63,7 +63,9 @@ I love Python. Therefore, almost all this project uses Python:
 
 ## Installation
 
-This project was developed and tested on Xubuntu 22.04, but will probably work on any recent Ubuntu or Debian.
+This repository was tested on Uubuntu 20.04 and 22.04. It will probably work on any recent Ubuntu or Debian. 
+
+There is a known issue on Ubuntu 18.04: Ansible fails, because the module 'npm' does not exist on the ansible version that is installed on 18.04. A workaround is to remote the step 'Install nodejs and npm...' from the playbook (The file `ansible/all_tasks.yml`). Also, you will need to manually install the CDK package (`npm install -g aws-cdk`).
 
 By necessity, we are using 3 different installation methods: using Ubuntu's native `apt`, using Python's native `pip3` and using nodejs/npm (which is required to install the CDK software).
 
