@@ -18,13 +18,14 @@ Furthermore, pains were taken to document the installation process, choices and 
 
 ## Overview
 
-This repository contains instructions for the setup, starting from a clean 20.04 Ubuntu server installation, of a Python-based back-end project.
+This repository contains detailed setup instructions, starting from a clean 20.04 or 22.04 Ubuntu server or Desktop installation.
 
-This template uses three AWS services:
+This template uses a few AWS services:
 
-- REST API gateway with an IP white-list and the API defined, so that the gateway can reject non-well-formed URLs and traffic from unwanted IPs.
-- DynamoDB, defined with two sample tables at the CDK/stack level.
-- A single Lambda that lists the users in the users table.
+- REST API gateway: Here used with an IP white-list and the API calls defined, so that the gateway can reject non-well-formed URLs and traffic from unwanted IPs.
+- DynamoDB: defined with two sample tables at the CDK/stack level.
+- Lambda: A single Lambda is present. It lists the users in the users table.
+- CDK and CloudFormation: are used to deploy the above resources in a single step.
 
 The technologies demonstrated here are:
 
@@ -63,9 +64,7 @@ This project uses Python wherever possible:
 
 ## Installation
 
-This repository was tested on Ubuntu 20.04 and 22.04. It will probably work on any recent Ubuntu or Debian installation. 
-
-There is a known issue on Ubuntu 18.04: Ansible fails because the module 'npm' does not exist on the Ansible version that is installed on 18.04. A workaround is to remove the step 'Install nodejs and npm...' from the playbook (The file `ansible/all_tasks.yml`). Also, you will need to manually install the CDK package (`npm install -g aws-cdk`).
+This repository was tested on Ubuntu 20.04 and 22.04. It will probably work on any recent Ubuntu or Debian installation. Please do NOT use Ubuntu 18.04 or earlier - it will not work.
 
 By necessity, we are using three different installation methods: Ubuntu's native `apt`, Python's native `pip3` and nodejs/npm (which is required to install the CDK software).
 
@@ -79,7 +78,7 @@ Notes:
   
   `cd ansible; ./INSTALL`
   
-  This will globally install the  Localstack dependencies, nodejs and the CDK.
+  This will globally install the Localstack dependencies, nodejs and the CDK.
   
  You will need to type your user password twice: once to install Ansible and then to allow Ansible to perform the global installation. 
 
