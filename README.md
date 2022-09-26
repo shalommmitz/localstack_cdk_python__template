@@ -237,22 +237,53 @@ cd infrastructure`
 - `. set_stack_env_vars`         # This optional step will set some env vars useful for other scripts
 - Run `./test`
 
-## Modifying the stack
+## Growing your Project
 
-  The stack is a definition of all the AWS entities your project uses.
- If you need to add or change those resources, you will need to edit the `<project folder>/infrastructure/cdk_stack/stack.py` file, then run the "Deploy the stack" procedure, above.
+Once everything is working and running, you will typically want to add functionality to your project
+Below are the steps needed to do this.
 
-## Lambda update process
+### Modifying the stack
 
- You will probably spend most of your time iterating on the Lambda function(s).
- This is where this setup shines: since everything is local, this process is much quicker compared to using the 'real' AWS.
+  The stack defines all the AWS entities used by your project.
+  The stack is actually defined in a single file: `<project folder>/infrastructure/cdk_stack/stack.py`
+  You will edit this file whenever you need to add or change those resources.
+  After editing this file, run the "Deploy the stack" procedure, above.
+
+### Lambda update process
+
+  You will probably spend most of your time iterating on the Lambda function(s).
+  This is where this setup shines: since everything is local, this process is much quicker compared to using the 'real' AWS.
 
   The procedure is:
 
-- Perform the "Running everything" procedure, above.
-- Run: `debug_lambda`
- This script will let you edit the Lambda function, then deploy the modified Lambda, then run the `test` script.
+    - One time: Setup a running environment , by perform the "Running everything" procedure, above.
+    - Run: `debug_lambda`
+      This script will let you edit the Lambda function, then deploy the modified Lambda, then run the `test` script.
+    - Run `show_lambda_logs` to see the output of the Lambda
+    
+  Notes:
+    - You may edit the lambda(s) using any mean you like, and then run 'update_lambdas', which will upload the modified code.
+    - Sometimes it is convenient to run the lambdas without uploading. In such a case, you will be able to see the output of the lambda more easily. In order to run the lambda, simply cd to the folder `lambda_functions` and run `python3 <lambda_file_name>`. How does this work ? The end of the Lambda contains test code that runs in this case. Also, the Lambda is (mostly) supplied with the same environments variables when run in the natural way (I.e., by the AWS service) and using this method.
+   
+### Adding a new Lambda
 
+  Adding a new lambda:
+
+    - Add the name of the new Lambda to the lambda_file_names list in stack.py
+    - If needed, give the new Lambda rights on one or more tables, also in stack.py
+    - Add the lambda code at the "lambda_functions" folder
+
+### Adding a new Table
+
+  Adding a new table:
+
+    - Add the definition of the new table in stack.py
+    - If needed, give the Lambda(s) rights on the table, also in stack.py
+    - Add environment variable that let the Lambda discover the lambda_name.
+
+      This is done at two places: the environment definition for the Lambdas (roughly at the middle of the  `stack.py` file and at the end of the file.
+
+    - Add code to interact with the new table: at the Lambdas, `populate_tables` and `test`.
 
 ## Utility scripts
 
@@ -270,6 +301,11 @@ This script will vi a Lambda, then deploy the modified code, then run the 'test'
 
 This script uploads the current code of the Lambda (present at the folder lambda_functions) to AWS.
 This script is called by the 'debug_lambda' script.
+
+### show_lambda_logs
+
+This useful script shows the output of the Lambda(s). 
+In other words, you can see what the lambda printed during run.
 
 ### show_localstack_status
 
@@ -293,8 +329,15 @@ End-to-end example test: sends a URL to the gateway, which runs the Lambda, whic
   This is typical done when the heavy development is done.
 
   The only thing you need to do differently is to enter "r" (for 'real')  when running `./create_and_deploy_stack`
+  Also, make sure you have the correct/real values at ~/.aws/credentials, not the dummy values.
+  
+  The mechanism used to support working in either the local or 'real' environment is:
+  
+    - When you create the stack you specify which environment to work with
+    - You decision sets the environment variable `USE_LOCALSTACK` to True or False
+    - All the scripts use this environment variable to approach the correct AWS instance.
 
-## Updating localstack
+## Upgrading localstack
 
 It is recommended to do this once in a while, in order to get the most-recent improvements in localstack.
 
