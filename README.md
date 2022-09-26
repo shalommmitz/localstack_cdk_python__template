@@ -70,8 +70,6 @@ By necessity, we are using three different installation methods: Ubuntu's native
 
 Notes: 
 
-- You might want to change the top folder name (currently: `cdk_python_localstack_template`) to your own project’s name.
-
 - You need to perform all the 'global' installations only once. 
 
 - You may perform all the global installations automatically by running 
@@ -154,7 +152,6 @@ Localstack is  the AWS local services emulation.
 
 ```
 cd <project folder>
-pip3 install boto3
 git clone https://github.com/localstack/localstack
 cd localstack
 make install
