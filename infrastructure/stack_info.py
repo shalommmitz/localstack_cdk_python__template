@@ -40,7 +40,8 @@ class StackInfo(object):
 if __name__=="__main__":
     use_localstack = False
     if "USE_LOCALSTACK" in os.environ.keys():
-        use_localstack = (os.environ["USE_LOCALSTACK"].lower()=="true")
+        if os.environ["USE_LOCALSTACK"].lower()=="true":
+            use_localstack = True
 
     si = StackInfo(use_localstack)
     print("Number of stacks: ", si.get_num_stacks())

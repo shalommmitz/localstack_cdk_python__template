@@ -5,6 +5,7 @@ from ruamel.yaml.scalarstring import PreservedScalarString as pss
 ryaml = YAML()
 
 t = yaml.safe_load(open("cdk_template/template_as_generated_by_cdk.yaml"))
+t.pop("Rules")
 t.pop("Conditions")
 t.pop("Parameters")
 t["Resources"].pop("CDKMetadata")

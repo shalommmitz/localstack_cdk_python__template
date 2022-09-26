@@ -2,8 +2,10 @@
 import stack_info
 import os, time
 
-answer = input("Enter 'y' to use localstack (otherwise will target the 'real' AWS) > ")
-use_localstack = ( answer.lower()=="y")
+answer = ''
+while answer not in ['r', 'l']:
+    answer = input("Enter 'l' to use localstack, or 'r' to use the 'real' AWS) > ").lower()
+use_localstack = ( answer=="l")
 if use_localstack:
     print("Will use localstack")
 else:
@@ -26,9 +28,14 @@ if status!=None:
     print("   WARNING: the above two actions might erase all your table data.")
     exit()
 
+os.system("rm -f cdk_template/template_as_generated_by_cdk.yaml")
 print("Generating CloudFormatioon template JSON using CDK")
 cmd = f'export USE_LOCALSTACK={use_localstack}; cd cdk_template; cdk synth >template_as_generated_by_cdk.yaml'
 ans = os.popen(cmd).read()
+template_file_size = os.path.getsize('cdk_template/template_as_generated_by_cdk.yaml')
+if template_file_size<100:
+    print("CDK did not genrete template file - Aborting")
+    exit()
 
 print("Stripping the CloudFormatioon template of CDK metadata")
 cmd = "./clean_template"
@@ -41,9 +48,10 @@ if use_localstack:
     cmd += '  --endpoint-url http://localhost:4566 \\\n'
 cmd += '''\
   --stack-name test1 \\
-  --template-body file://template.yaml
+  --template-body file://template.yaml --capabilities CAPABILITY_IAM
 '''
 ans = os.popen(cmd).read()
+print("Anser to 'create stack' command:")
 print(ans)
 if ans=='Could not connect to the endpoint URL: "http://localhost:4566/"':
     print("Aborting - maybe you need to run localstack at a different terminal ?")
@@ -54,7 +62,7 @@ stack_status = si.get_stack_status('test1')
 print("   ", stack_status)
 
 while stack_status=='CREATE_IN_PROGRESS':
-    print("     Waiting  for stack creation to complete")   # Need add time out
+    print("    Waiting for stack creation to complete")   # Need add time out
     time.sleep(1)
     stack_status = si.get_stack_status('test1') 
 
@@ -75,8 +83,13 @@ for output in outputs:
     open("../set_stack_env_vars", 'a').write(f'export {key}={val}\n')
 os.system('chmod +x ../set_stack_env_vars')
 print("Created the script '../set_stack_env_vars'")
+
+print("Fixing lambdas by uploading full zip:")
+res = os.popen("cd ..; . ./set_stack_env_vars; ./update_lambdas").read()
+print(res)
+
 print("Recomended next steps:")
 print("   Run: . ../set_stack_env_vars")
-print("   Run: ./populate_users_table")
+print("   Run: ./populate_tables")
 
 
