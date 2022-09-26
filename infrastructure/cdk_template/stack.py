@@ -13,7 +13,8 @@ from aws_cdk import (
 )
 
 # Allow only specified IPs to access the API gw
-white_listed_ips = ["192.3.32.0/22", "127.0.0.1", "0.0.0.0/32"]   
+# Current values allow all IP-v4 addresses - replace with real IPs/ranges for real use
+white_listed_ips = ["0.0.0.0/1","128.0.0.0/1" ]   
 
 
 class CdkTemplateStack(Stack):
