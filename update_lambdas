@@ -1,9 +1,61 @@
-cd lambda_functions
-rm abc.zip
-sleep 0.4
-cp handle_url_lambda.py index.py
-zip abc handle_url_lambda.py index.py
-aws --endpoint-url=http://localhost:4566 \
-lambda update-function-code \
---function-name $handleUrlTableName \
---zip-file fileb://abc.zip
+#!/usr/bin/env python3
+import boto3
+import os
+import json
+import glob
+
+use_localstack = False
+if "USE_LOCALSTACK" in os.environ.keys():
+    if os.environ["USE_LOCALSTACK"].lower()=="true":
+        use_localstack = True
+
+if use_localstack:
+    cmd_start = "cd lambda_functions; aws --endpoint-url=http://localhost:4566"
+else:
+    cmd_start = "cd lambda_functions; aws"
+
+##Get names of all Lambdas
+#for env_var in os.environ.keys():
+#    if env_var.endswith("FunctionName"):
+#        print(env_var)
+
+lambdas = []
+for fn in glob.glob("lambda_functions/*.py"):
+    core_fn = fn.replace("lambda_functions/","").replace(".py","")
+    if core_fn in ["index", "utils"]:
+        continue
+    print(core_fn)
+    # Example: converts aaa_bbb_ccc to aaaBbbCccFunctionName
+    env_var_name = "".join([ w.capitalize() for w in core_fn.split("_") ])
+    env_var_name = env_var_name[0].lower() + env_var_name[1:] +"FunctionName"
+    lambdas.append({"fn": core_fn +".py", "name": os.environ[env_var_name]})
+
+
+for l in lambdas:
+    file_name = l["fn"]
+    print(f'Uploading lambda {file_name}')
+    zip_fn = "zip_of_" + file_name[:-3] +".zip"
+
+    #Before wee really start, lets verify that function compiles correctly
+    print("    Performing sanity check (will abort on error)")
+    source = open("lambda_functions/"+ file_name, 'r').read() + '\n'
+    compile(source, "lambda_functions/"+ file_name, 'exec')
+    os.system("rm -f lambda_functions/"+ zip_fn)
+    os.system("cp lambda_functions/"+ file_name +" lambda_functions/index.py")
+    cmd = "cd lambda_functions; zip "+ zip_fn +" index.py utils.py"
+    os.popen(cmd).read()
+    cmd = cmd_start + " lambda update-function-code"
+    cmd += " --function-name "+ l["name"]
+    cmd += " --zip-file fileb://"+ zip_fn +" 2>&1"
+    res = os.popen(cmd).read()
+    try:
+        res = json.loads(res)
+    except:
+        print("Result of the upload is not a valid JSON.")
+        print("   Probably it means an error occured")
+        print()
+        print("Got the result:")
+        print(res)
+        exit()
+    status = res["LastUpdateStatus"]
+    print("    Status:", status)
