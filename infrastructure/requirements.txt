@@ -3,3 +3,4 @@ ruamel.yaml
 boto3
 aws-cdk-lib==2.31.0
 constructs>=10.0.0,<11.0.0
+requests
