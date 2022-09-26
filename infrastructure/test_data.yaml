@@ -1,0 +1,17 @@
+users:
+   "0": Nickname0
+   "1": "First1 Last1"
+   "2": "First2 M.2 ReallyReallyLongLast2"
+weights_and_expected_result:
+   day-21:
+     "1": [101, "Rejected, because before epoch"]
+   day-20:
+     "1": [100, "Expected no winner, becuase only prev w is before epoch"]
+   day-19:
+     "1": [100, "Expected no winner, because no weight loss"]
+   day-15:
+     "1": [99, "Expected no winner, because no weight last 3 days"]
+   day-10:
+     "1": [100, "Expected no winner, because no weight last 3 days"]
+   day-7:
+     "1": [99, "Expected winner, w/1 percen w loss"]

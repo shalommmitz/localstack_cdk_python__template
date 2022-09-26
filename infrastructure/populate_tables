@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+# Source of this code: https://hands-on.cloud/working-with-aws-batch-in-python-using-boto3/
+
+import yaml
+import boto3
+import os
+from datetime import datetime, date, timedelta
+from decimal import Decimal
+
+def get_date(date_indicator):
+    today = datetime.utcnow().date()
+    num_days_before_today = int(date_indicator.replace("day-", ""))
+    return (today - timedelta(days=num_days_before_today)).isoformat()
+
+use_localstack = False
+if "USE_LOCALSTACK" in os.environ.keys():
+    if os.environ["USE_LOCALSTACK"].lower()=="true":
+        use_localstack = True
+
+if use_localstack:
+    print("Will use localstack")
+else:
+    print("Will use the 'real' AWS")
+
+table_names = {}
+for table in [ "users", "weights"]:
+    try:
+        env_var_name = f'{table}TableName'
+        table_names[table] = os.environ[env_var_name]
+    except:
+        print(f'ERROR: expected envirnment variable "{env_var_name}" does not exist') 
+        exit()
+
+if use_localstack:
+    resource = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
+else:
+    resource = boto3.resource('dynamodb')
+
+data = yaml.safe_load(open("test_data.yaml"))
+
+
+usersTable = resource.Table(table_names["users"])
+for user_id in data["users"]:
+    item = { 'UserID': int(user_id), 'UserName': data["users"][user_id] }
+    usersTable.put_item(Item=item)
+
+weightsTable = resource.Table(table_names["weights"])
+weights = data["weights_and_expected_result"]
+for date_str in weights.keys():
+    date = get_date(date_str)
+    for user_id in weights[date_str]:
+        weight_and_expected_res = weights[date_str][user_id]
+        weight = Decimal(str(weight_and_expected_res[0]))
+        expected = weight_and_expected_res[1]
+        print(expected)
+        item = {'UserID': int(user_id), 'UtcDate': date, "Weight": weight}
+        input(f'weghts: {item}. Press Enter > ')
+        weightsTable.put_item(Item=item)
+
+
+
+print('records imported successfully')
