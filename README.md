@@ -47,8 +47,10 @@ This project uses Python wherever possible:
 - Only a part of the normal CDK deployment process is used. Specifically, I have chosen to only use the "synth" (i.e., generate Cloud-Formation template) feature of the CDK. This enables a more detailed control of and insight into the deployment process.
  You may prefer to use CDK-deploy. It will make your life much simpler.
 
-- Lambdas are deployed by reading the code and including the code as part of the stack.
- This will break once the Lambda is above a certain size. Improvements are TBD.
+- Intially, dummy Lambda code is uploaded, and is later replaced by the real code.
+  This is this this way to avoid uploading the Lambdas to an S3 storage.
+
+- Only one stack is used, which is named 'test1'. This was done for simplicity.
 
 ### Localstack
 
@@ -158,7 +160,6 @@ make install
 ```
 
 
-
 ## Sanity testing and troubleshooting the installation
 
 ### Testing the  CDK
@@ -238,6 +239,10 @@ cd infrastructure`
 
 Once everything is working and running, you will typically want to add functionality to your project
 Below are the steps needed to do this.
+
+### Limiting the IP addresses that can use the API Gateway
+
+   Near the top of the file that defines the stack: (stack.py), you can enter specific IP addresses and/or ranges. This will limit which IPs can access your API.
 
 ### Modifying the stack
 
