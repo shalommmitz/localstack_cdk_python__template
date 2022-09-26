@@ -1,4 +1,67 @@
-rm -f users
-wget ${restApiUrl}MttW/users
-cat users
-#curl -X POST -d '{ "customerId": 1 }' https://example.com/
+#!/usr/bin/env python3
+import requests
+import os
+import json
+import datetime
+
+base_url = os.environ["restApiUrl"]
+
+urls = []
+urls.append(["GET", "MttW/users"])
+urls.append(["POST", "MttW/user/0/weight/14.00"])
+urls.append(["POST", "MttW/user/666/weight/11.00"])   # Test for non existing userID
+urls.append(["GET", "MttW/fullStats"])
+urls.append(["GET", "MttW/threeDaysStats"])
+
+for url in urls:
+    method = url[0]; path = url[1]
+    if method=="GET":
+        res = requests.get(base_url + path)
+    else:
+        res = requests.post(base_url + path)
+    print(path)
+    dont_print = False
+    try:
+        if res.json().get("errorType"):
+            print("   ERROR: Type:", res.json().get("errorType"))
+            st = res.json().get("stackTrace")
+            for l in st:
+                if "lambda_executors.py" in l: continue
+                short_line = l.split()[1].split("/")[-1].replace('"','')
+                short_line += " "+ " ".join(l.split()[2:])
+                print("  ",short_line)
+            dont_print = True
+    except:
+        pass
+    if dont_print: continue
+    try:
+        print(res.json().keys())
+    except:
+        print("\nCould not print keys of response")
+        print("response:")
+        print(res)
+    try:
+        if res.json().get("weights"):
+            w = res.json().get("weights")
+            dates = list(w.keys())
+            dates.sort()
+            for date in dates:
+                print("   ", date, w[date])
+        if res.json().get("winners"):
+            w = res.json().get("winners")
+            dates = list(w.keys())
+            dates.sort()
+            for date in dates:
+                print("   ", date, w[date])
+            dont_print = True
+        if res.json().get("cash"):
+            c = res.json().get("cash")
+            dates = list(w.keys())
+            dates.sort()
+            for date in dates:
+                print("   ", date, c[date])
+            dont_print = True
+    except:
+        pass
+    if dont_print: continue
+    print("   ", res.text)

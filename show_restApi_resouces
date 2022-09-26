@@ -9,10 +9,10 @@ if not "restApiId" in os.environ.keys():
     exit()
 restApiId = os.environ["restApiId"]
 
-try:
-    use_localstack = bool(os.environ["USE_LOCALSTACK"])
-except:
-    use_localstack = False
+use_localstack = False
+if "USE_LOCALSTACK" in os.environ.keys():
+   if os.environ["USE_LOCALSTACK"].lower()=="true":
+       use_localstack = True
 
 if use_localstack:
     client = boto3.client('apigateway', endpoint_url="http://localhost:4566")
@@ -21,4 +21,7 @@ else:
     
 items = client.get_resources(restApiId=restApiId)["items"]
 for item in items:
-    print(item["path"])
+    if "resourceMethods" in item.keys():
+        path = item["path"]
+        rm = list(item["resourceMethods"].keys())
+        print(path, rm)
