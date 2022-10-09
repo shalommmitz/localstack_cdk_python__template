@@ -52,7 +52,7 @@ class CdkTemplateStack(Stack):
 
         # Intially we will load dummy code, to prevent dependencies=related failueres
         # Later in the create-stack script we will load the full/real code as zip
-        dummy_code = ''' \
+        dummy_code = '''\
 def events_handler(events, context):
     msg = 'ERROR: dummy code for Lambda "NAME" - please run "update_lambdas"'
     print(msg)
